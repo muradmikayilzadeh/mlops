@@ -106,3 +106,24 @@ class CustomOHETransformer(BaseEstimator, TransformerMixin):
     return self.transform(X)
 
 
+class CustomSigma3Transformer(BaseEstimator, TransformerMixin):
+  def __init__(self, target_column):
+      self.target_column = target_column
+      self.mean = None
+      self.std = None
+
+  def fit(self, X, y=None):
+      if self.target_column not in X.columns: raise ValueError(f"'{self.target_column}' not found in the DataFrame.")
+      
+      self.mean = X[self.target_column].mean()
+      self.std = X[self.target_column].std()
+      return self
+
+  def transform(self, X):
+      if self.mean is None or self.std is None:
+          raise ValueError("The transformer has not been fitted.")
+      X[self.target_column] = X[self.target_column].clip(
+          self.mean - 3 * self.std, self.mean + 3 * self.std
+      )
+      X.reset_index(drop=True, inplace=True)
+      return X
