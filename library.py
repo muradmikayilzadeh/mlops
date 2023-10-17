@@ -170,3 +170,20 @@ class CustomTukeyTransformer(BaseEstimator, TransformerMixin):
     self.df[self.target_column] = self.df[self.target_column].clip(lower=self.low, upper=self.high)
     self.df.reset_index(drop=True)
     return self.df
+
+class CustomRobustTransformer(BaseEstimator, TransformerMixin):
+  def __init__(self, column):
+    self.column = column
+
+  def fit (self,df):
+    self.df = df.copy()
+    self.iqr = self.df[self.column].quantile(.75) - self.df[self.column].quantile(.25)
+    self.med = self.df[self.column].median()
+    return self
+
+  def transform(self,df):
+    self.fit(df)
+    self.df[self.column] -= self.med
+    self.df[self.column] /= self.iqr
+    self.df[self.column].min(), self.df[self.column].max()
+    return self.df
