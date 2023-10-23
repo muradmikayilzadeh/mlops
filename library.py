@@ -177,7 +177,7 @@ class CustomRobustTransformer(BaseEstimator, TransformerMixin):
   def __init__(self, column):
     self.column = column
 
-  def fit (self,df):
+  def fit (self,df, y=None):
     self.df = df.copy()
     self.iqr = self.df[self.column].quantile(.75) - self.df[self.column].quantile(.25)
     self.med = self.df[self.column].median()
