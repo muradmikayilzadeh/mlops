@@ -9,6 +9,7 @@ import subprocess
 import sys
 subprocess.call([sys.executable, '-m', 'pip', 'install', 'category_encoders'])  #replaces !pip install
 import category_encoders as ce
+from sklearn.neighbors import KNeighborsClassifier 
 
 
 class CustomMappingTransformer(BaseEstimator, TransformerMixin):
