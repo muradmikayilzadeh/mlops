@@ -9,9 +9,7 @@ import subprocess
 import sys
 subprocess.call([sys.executable, '-m', 'pip', 'install', 'category_encoders'])  #replaces !pip install
 import category_encoders as ce
-fitted_pipeline = titanic_transformer.fit(X_train, y_train)  #notice just fit method called
-import joblib
-joblib.dump(fitted_pipeline, 'fitted_pipeline.pkl')
+
 
 
 class CustomMappingTransformer(BaseEstimator, TransformerMixin):
