@@ -194,8 +194,9 @@ class CustomRobustTransformer(BaseEstimator, TransformerMixin):
     return self.df
 
   def fit_transform(self,df,y=None):
-    self.fit(df)
-    return self.transform(df)
+    self.fit(df, y)
+    result = self.transform(df)
+    return result
 
 def find_random_state(features_df, labels, n=200):
   model = KNeighborsClassifier(n_neighbors=5)  #instantiate with k=5.
