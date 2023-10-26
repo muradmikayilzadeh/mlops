@@ -186,7 +186,7 @@ class CustomRobustTransformer(BaseEstimator, TransformerMixin):
         assert isinstance(df, pd.core.frame.DataFrame), f'{self.__class__.__name__}.fit expected DataFrame but got {type(df)} instead.'
         assert self.column in df.columns.to_list(), f'{self.__class__.__name__}.fit unrecognizable column {self.column}.'
 
-        self.iqr = df[self.column].quantile(0.75) - df[self.column].quantile(0.25)
+        self.iqr = float(df[self.column].quantile(.75) - df[self.column].quantile(.25))
         self.med = df[self.column].median()
         return self
 
@@ -195,10 +195,10 @@ class CustomRobustTransformer(BaseEstimator, TransformerMixin):
         assert hasattr(self, 'iqr') and hasattr(self, 'med'), f'NotFittedError: This {self.__class__.__name__} instance is not fitted yet. Call "fit" with appropriate arguments before using this estimator.'
         assert self.column in df.columns.to_list(), f'{self.__class__.__name__}.transform unrecognizable column {self.column}.'
 
-        df_ = df.copy()
-        df_[self.column] -= self.med
-        df_[self.column] /= self.iqr
-        return df_
+        self.df = df.copy()
+        self.df[self.column] -= self.med
+        self.df[self.column] /= self.iqr
+        return self.df
 
     def fit_transform(self, df, y=None):
         self.fit(df)
