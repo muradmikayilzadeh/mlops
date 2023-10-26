@@ -259,3 +259,4 @@ customer_transformer = Pipeline(steps=[
     ('scale_time spent', CustomRobustTransformer('Time Spent')), #from 5
     ('impute', KNNImputer(n_neighbors=5, weights="uniform", add_indicator=False)),
     ], verbose=True)
+
