@@ -179,33 +179,30 @@ class CustomTukeyTransformer(BaseEstimator, TransformerMixin):
     return self.df
 
 class CustomRobustTransformer(BaseEstimator, TransformerMixin):
-  def __init__(self, column):
-    #fill in rest below
-    self.target_column = column
-    self.iqr = None
-    self.med = None
+    def __init__(self, column):
+        self.column = column
 
-  def fit(self, X, y = None):
-    assert isinstance(X, pd.core.frame.DataFrame), f'{self.__class__.__name__}.fit expected Dataframe but got {type(X)} instead.'
-    assert self.target_column in X.columns.to_list(), f'{self.__class__.__name__}.fit unrecognizable column {self.target_column}.'
-    self.iqr = float(X[self.target_column].quantile(.75) - X[self.target_column].quantile(.25))
-    self.med = X[self.target_column].median()
-    return self
+    def fit(self, df, y=None):
+        assert isinstance(df, pd.core.frame.DataFrame), f'{self.__class__.__name__}.fit expected DataFrame but got {type(df)} instead.'
+        assert self.column in df.columns.to_list(), f'{self.__class__.__name__}.fit unrecognizable column {self.column}.'
 
-  def transform(self, X):
-    assert isinstance(X, pd.core.frame.DataFrame), f'{self.__class__.__name__}.transform expected Dataframe but got {type(X)} instead.'
-    assert isinstance(self.iqr, float), f'NotFittedError: This {self.__class__.__name__} instance is not fitted yet. Call "fit" with appropriate arguments before using this estimator.'
-    assert self.target_column in X.columns.to_list(), f'{self.__class__.__name__}.transform unrecognizable column {self.target_column}.'
+        self.iqr = df[self.column].quantile(0.75) - df[self.column].quantile(0.25)
+        self.med = df[self.column].median()
+        return self
 
-    X_ = X.copy()
-    X_[self.target_column] -= self.med
-    X_[self.target_column] /= self.iqr
-    return X_
+    def transform(self, df):
+        assert isinstance(df, pd.core.frame.DataFrame), f'{self.__class__.__name__}.transform expected DataFrame but got {type(df)} instead.'
+        assert hasattr(self, 'iqr') and hasattr(self, 'med'), f'NotFittedError: This {self.__class__.__name__} instance is not fitted yet. Call "fit" with appropriate arguments before using this estimator.'
+        assert self.column in df.columns.to_list(), f'{self.__class__.__name__}.transform unrecognizable column {self.column}.'
 
-  def fit_transform(self, X, y = None):
-    self.fit(X,y)
-    result = self.transform(X)
-    return result
+        df_ = df.copy()
+        df_[self.column] -= self.med
+        df_[self.column] /= self.iqr
+        return df_
+
+    def fit_transform(self, df, y=None):
+        self.fit(df)
+        return self.transform(df)
 
 
 def find_random_state(features_df, labels, n=200):
