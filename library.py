@@ -180,22 +180,31 @@ class CustomTukeyTransformer(BaseEstimator, TransformerMixin):
 
 class CustomRobustTransformer(BaseEstimator, TransformerMixin):
   def __init__(self, column):
-    self.column = column
+    #fill in rest below
+    self.target_column = column
+    self.iqr = None
+    self.med = None
 
-  def fit (self,df, y=None):
-    self.iqr = float(df[self.column].quantile(.75) - df[self.column].quantile(.25))
-    self.med = df[self.column].median()
+  def fit(self, X, y = None):
+    assert isinstance(X, pd.core.frame.DataFrame), f'{self.__class__.__name__}.fit expected Dataframe but got {type(X)} instead.'
+    assert self.target_column in X.columns.to_list(), f'{self.__class__.__name__}.fit unrecognizable column {self.target_column}.'
+    self.iqr = float(X[self.target_column].quantile(.75) - X[self.target_column].quantile(.25))
+    self.med = X[self.target_column].median()
     return self
 
-  def transform(self,df):
-    self.df = df.copy()
-    self.df[self.column] -= self.med
-    self.df[self.column] /= self.iqr
-    return self.df
+  def transform(self, X):
+    assert isinstance(X, pd.core.frame.DataFrame), f'{self.__class__.__name__}.transform expected Dataframe but got {type(X)} instead.'
+    assert isinstance(self.iqr, float), f'NotFittedError: This {self.__class__.__name__} instance is not fitted yet. Call "fit" with appropriate arguments before using this estimator.'
+    assert self.target_column in X.columns.to_list(), f'{self.__class__.__name__}.transform unrecognizable column {self.target_column}.'
 
-  def fit_transform(self,df,y=None):
-    self.fit(df, y)
-    result = self.transform(df)
+    X_ = X.copy()
+    X_[self.target_column] -= self.med
+    X_[self.target_column] /= self.iqr
+    return X_
+
+  def fit_transform(self, X, y = None):
+    self.fit(X,y)
+    result = self.transform(X)
     return result
 
 def find_random_state(features_df, labels, n=200):
