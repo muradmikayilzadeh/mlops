@@ -11,6 +11,7 @@ import sys
 subprocess.call([sys.executable, '-m', 'pip', 'install', 'category_encoders'])  #replaces !pip install
 import category_encoders as ce
 from sklearn.neighbors import KNeighborsClassifier 
+from sklearn.linear_model import LogisticRegressionCV
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
 
